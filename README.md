@@ -38,7 +38,7 @@ wechat-spider/
 
 1. 克隆项目到本地：
    ```bash
-   git clone https://github.com/yourusername/wechat-spider.git
+   git clone https://github.com/linlide/wechat-spider.git
    cd wechat-spider
    ```
 
