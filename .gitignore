@@ -1,18 +1,54 @@
-*/__pycache__
-*.pyc
-.svn/
-log/*
-config/
-.vs/
-.vscode/
-*.log
-venv
-.venv/
-test.py
-.DS_Store
-.idea
-.git
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-config.yaml
-mariadb_data/
-mitmproxy/
+# Virtual Environment
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+
+# Database
+*.sqlite3
+*.db
+
+# Media
+media/
+*.xlsx
+*.csv
+*.tsv
+
+# Environment variables
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db

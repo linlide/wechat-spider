@@ -1,205 +1,160 @@
-# 微信爬虫
+# 微信公众号文章爬虫
 
-<!--<!--**该爬虫为基于中间人的方式，时效性不高，且可能会封号，请酌情使用。
-若需`长期``稳定``实时`监控大批量公众号，可使用如下api接口：**
+这是一个用于抓取微信公众号文章信息的爬虫工具。它可以自动获取文章标题、发布时间、阅读量和点赞数等信息，并将数据保存到MySQL数据库中。
 
-[http://182.92.108.94:2119/client/wechat_article/document](http://182.92.108.94:2119/client/wechat_article/document)
--->
+## 功能特点
 
-以下为部署文档
+- 自动获取文章标题、发布时间、阅读量和点赞数
+- 支持自动滚动页面，持续抓取数据
+- 数据实时保存到MySQL数据库
+- 支持导出数据到Excel文件
+- 防重复抓取机制
+- 详细的日志记录
 
-技术文档请查看：[https://t.zsxq.com/7ubmqNJ](https://t.zsxq.com/7ubmqNJ)
+## 系统要求
 
-逆向方式抓取的方案请查看：[https://wx.zsxq.com/dweb2/index/topic_detail/215584212588541](https://wx.zsxq.com/dweb2/index/topic_detail/215584212588541)
+- Python 3.8+
+- MySQL 5.7+
+- Android设备（用于运行微信）
+- ADB工具（用于与Android设备通信）
 
-## 功能：
+## 目录结构
 
-- [x] 检测公众号每日新发文章
-- [x] 抓取公众号信息
-- [x] 抓取文章列表
-- [x] 抓取文章信息
-- [x] 抓取阅读量、点赞量、评论量
-- [x] 抓取评论信息
-- [x] 临时链接转永久链接
+```
+wechat-spider/
+├── core/               # 核心代码目录
+│   └── crawler.py      # 爬虫核心代码
+├── utils/              # 工具类目录
+│   └── mysqldb.py     # 数据库工具类
+├── scripts/            # 脚本目录
+│   └── convert_to_excel.py  # Excel转换脚本
+├── sql/               # SQL脚本目录
+│   └── init.sql       # 数据库初始化脚本
+├── logs/              # 日志目录
+└── requirements.txt   # 项目依赖
+```
 
-打包好的执行文件下载地址
+## 安装步骤
 
-链接: https://pan.baidu.com/s/1hyhj6YnV-L9w8LPx42FFzQ  密码: qnk6
+1. 克隆项目到本地：
+   ```bash
+   git clone https://github.com/yourusername/wechat-spider.git
+   cd wechat-spider
+   ```
 
-## 特色：
+2. 创建并激活虚拟环境（推荐）：
+   ```bash
+   python -m venv venv
+   # Windows
+   venv\Scripts\activate
+   # macOS/Linux
+   source venv/bin/activate
+   ```
 
-1. **免安装**：支持mac、window，双击软件即可执行
-2. **自动化**：只需要配置好待监控的公众号列表，启动软件后即可每日自动抓取公众号及文章等信息
-3. **好对接**：抓取到的数据使用mysql存储，方便处理数据
-4. **不漏采**：采用任务状态标记的方式，防止遗漏每一个公众号、每一篇文章
-5. **分布式**：支持多个微信号同时采集，微信客户端支持Android、iphone、Mac、Window 全平台
+3. 安装依赖：
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 数据示例
+4. 安装 ADB 工具：
+   - macOS: `brew install android-platform-tools`
+   - Linux: `sudo apt-get install android-tools-adb`
+   - Windows: 下载 [Android SDK Platform Tools](https://developer.android.com/studio/releases/platform-tools)
 
-**1. 公众号数据**
-![-w829](media/15584541954959.jpg)
-
-**2. 文章列表数据**
-![-w1369](media/15584542414888.jpg)
-
-**3. 文章数据**
-![-w1466](media/15584545518249.jpg)
-
-**4. 阅读点赞评论数据**
-![-w623](media/15584546784023.jpg)
-
-**5. 评论数据**
-![-w1033](media/15584547028361.jpg)
-
-## 所需环境
-
-1. mysql：用来存储抓取到的数据以及任务表
-2. redis：任务缓存，减少操作mysql的次数
-
-## 安装配置
-
-> 以下安装说明安需查看，仅作为参考。因每个人环境不同，可能安装会有些差异，可参考网上的资料
-
-### 1. 安装mysql
-#### 1.1 window
-#### 1.2 mac
-### 2. 安装redis
-#### 2.1 window
-#### 2.2 mac
-### 3. 安装证书
-
-可用浏览器访问 mitm.it 然后下载，或者百度如何安装mitmproxy证书
-
-#### 3.1 iphone
-1. 下载安装完毕后别忘记最后一步
-2. 打开设置-通用-关于本机-证书信任设置
-3. 开启mitmproxy选项。
-
-#### 3.2 android
-1. 安装完毕检查
-2. 打开设置-安全-信任的凭据
-3. 查看安装的证书是否存在
-
-#### 3.3 window
- 2. 双击运行
- 3. 安装到本地计算机
- 4. 需要密钥时跳过
- 5. 选择“将所有的证书都放入下列存储”，接着选择“受信任的根证书颁发机构”
- 6. 最后，弹出警告窗口，直接点击“是”
-
-#### 3.4 mac
-2. 下载完双击安装
-3. 打开Keychain Access.app
-4. 选择login(Keychains)和Certificates(Category)中找到mitmproxy
-5. 点击mitmproxy，在Trust中选择Always Trust
-
-
-### 4. 配置代理
-
-> 如果使用手机，需要确保手机和运行wechat-spider的电脑连接在同一个路由器上
-
-#### 3.1 iphone
-
-打开设置-无线局域网-所连接的Wifi-配置代理-手动
-填上该安装服务器的IP和端口8080
-
-#### 3.2 android
-
-打开设置-WLAN-长按所连接的网络-修改网络-高级选项-手动
-填上该安装服务器的IP和端口8080
-
-#### 3.3 window
-打开chrome 设置->高级
-![A580D0082CCEE0621F98FAF003C5530E](media/A580D0082CCEE0621F98FAF003C5530E.png)
-![95AE10B3227FDE0637AB227A5A8267E3](media/95AE10B3227FDE0637AB227A5A8267E3.png)
-
-#### 3.4 mac
-
-打开系统配置（System Preferences.app）- 网络（Network）- 高级（Advanced）- 代理（Proxies）- Secure Web Proxy(HTTPS)
-填上该安装服务器的IP和端口8080
-
-![-w668](media/15584581938431.jpg)
-![-w667](media/15584582326072.jpg)
-
-
+5. 配置MySQL数据库：
+   ```bash
+   mysql -u root -p < sql/init.sql
+   ```
 
 ## 使用说明
 
-### 1. 安装如上说明安装好证书及配置好代理
-### 2. 正确配置config.yaml
+1. 连接Android设备：
+   ```bash
+   adb devices
+   ```
+   确保设备已正确连接并授权。
 
-主要是配置mysql及redis的链接信息，确保能正确链接上
+2. 在Android设备上打开微信公众号文章列表页面。
 
-### 3. 创建数据库 wechat
+3. 运行爬虫：
+   ```bash
+   python core/crawler.py
+   ```
 
-![-w418](media/15610827417503.jpg)
+4. 导出数据到Excel：
+   ```bash
+   python scripts/convert_to_excel.py
+   ```
+   生成的Excel文件将包含以下列：
+   - 文章标题
+   - 发布时间
+   - 阅读量
+   - 点赞数
+   - 抓取时间
 
+## 配置说明
 
-### 4. 启动wechat-spider
+1. 数据库配置（在代码中修改）：
+   ```python
+   db_config = {
+       'ip': 'localhost',
+       'port': 3306,
+       'db': 'wechat',
+       'user': 'your_username',
+       'passwd': 'your_password'
+   }
+   ```
 
-此步骤如果config里的auto_create_tables值为true时，会自动创建mysql数据表。建议首次启动时设置为true，创建完表后设置为false
-    
-### 5. 下发公众号任务
+## 注意事项
 
-![-w201](media/15584578582622.jpg)
-录入数据到wechat_account_task, 如：
-![-w503](media/15584579051963.jpg)
-只填写__biz就好, 如：MzIxNzg1ODQ0MQ==
-
-### 6. 点击任意一公众号，查看历史消息
-
-![-w637](media/15584585019970.jpg)
-
-当出现如上红框中的提示信息时，说明大功告成了，过一会可以去数据库里验证数据了
-
-技术交流
-----
-若大家有什么疑问或指教，可加qq群，一起讨论问题。请备注`微信爬虫学习交流`
-
-<img src='https://i.imgur.com/5FM26rc.png' align = 'center' width = "250" style = "margin-top:20px">
-
+1. 确保Android设备已启用USB调试模式
+2. 运行爬虫前，请确保微信已打开并显示文章列表页面
+3. 建议使用虚拟环境运行项目
+4. 定期备份数据库
+5. 遵守微信使用条款和相关法律法规
+6. 数据仅用于学习研究，请勿用于商业用途
 
 ## 常见问题
 
-### 1. mysql 链接问题
+1. 数据库连接失败
+   - 检查数据库配置是否正确
+   - 确保MySQL服务已启动
+   - 验证用户名和密码
 
-问题：链接时打印object supporting the buffer api required异常
-![](media/15610832298058.jpg)
-解决: 如果密钥是整形的，如123456，需要在配置文件中加双引号，如下：
+2. ADB连接问题
+   - 检查USB连接
+   - 确认设备已授权ADB调试
+   - 重启ADB服务：`adb kill-server && adb start-server`
 
-    mysqldb:
-      ip: localhost
-      port: 3306
-      db: wechat
-      user: root
-      passwd: "123456"
-      auto_create_tables: true # 是否自动建表 建议当表不存在是设置为true，表存在是设置为false，加快软件启动速度
+3. 数据导出失败
+   - 检查数据库中是否有数据
+   - 确保有足够的磁盘空间
+   - 验证Excel文件未被其他程序占用
 
-### 2. 正确配置完代理后提示证书或安全问题
+4. 爬虫无法获取数据
+   - 确保微信页面正确显示文章列表
+   - 检查Android设备是否保持唤醒状态
+   - 验证ADB连接是否稳定
 
-原因是我那个证书失效了，可参考 https://www.cnblogs.com/yunlongaimeng/p/9617708.html 安装数据
+## 开发说明
 
-### 3. 提示无任务
+1. 代码结构
+   - `core/crawler.py`: 爬虫核心逻辑，负责数据抓取
+   - `utils/mysqldb.py`: 数据库操作封装
+   - `scripts/convert_to_excel.py`: 数据导出工具
 
-检查 wechat_account_task 表中是否下发了__biz。可多下发几个测试
+2. 扩展开发
+   - 遵循代码风格和结构
+   - 添加新功能时注意兼容性
+   - 确保添加适当的错误处理
+   - 更新文档说明
 
-### 4. Exception:DISCARD without MULTI
+## 许可证
 
-![-w406](media/15632498867519.jpg)
+MIT License
 
-### 5. 正常启动后抓不到包
+## 免责声明
 
-1. 检是否设置代理
-2. 检查端口是否被占用
-
-## 微信攒赏
-
-开源项目不易，维护代码以及解决大家问题往往占据了大部分时间，为了保证内容持续输出，且**本项目恰巧对您有帮助**，还望多多支持哦(*￣︶￣)。
-
-可提供部署支持，答疑解惑（仅限打赏用户、提PR的开发者）。
-
-微信: boris_tm
-
-![赞赏码](media/%E8%B5%9E%E8%B5%8F%E7%A0%81.png)
+本项目仅供学习研究使用，请勿用于非法用途。使用本工具所产生的一切后果由使用者自行承担。
 
 
